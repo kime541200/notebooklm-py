@@ -8,17 +8,19 @@ The NotebookLM client is managed via a lifespan context manager,
 ensuring it is properly initialized before any tool is invoked and
 cleanly closed on server shutdown—regardless of how the server is started.
 """
+
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from fastmcp import FastMCP
+
+from nblm_mcp_server import tools
 
 # Use absolute imports so this file can be exec'd directly by the fastmcp CLI.
 # The package must be installed (editable: `uv pip install -e .`) for this to work.
 from nblm_mcp_server.client_service import setup_client, teardown_client
-from nblm_mcp_server import tools
 
 
 @asynccontextmanager

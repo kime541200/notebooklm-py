@@ -2,6 +2,7 @@
 
 All tools are registered onto the FastMCP instance via register().
 """
+
 from __future__ import annotations
 
 import logging
@@ -276,9 +277,7 @@ def register(mcp: FastMCP) -> None:
         if not conv_id:
             return {"conversation_id": None, "turns": []}
 
-        history = await client.chat.get_history(
-            notebook_id, limit=limit, conversation_id=conv_id
-        )
+        history = await client.chat.get_history(notebook_id, limit=limit, conversation_id=conv_id)
         turns = [{"question": q, "answer": a} for q, a in history]
         return {"conversation_id": conv_id, "turns": turns}
 
@@ -309,4 +308,3 @@ def register(mcp: FastMCP) -> None:
             "note_id": note.id,
             "title": note.title,
         }
-

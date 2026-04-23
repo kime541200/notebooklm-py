@@ -4,6 +4,7 @@ Manages the lifecycle of a shared NotebookLMClient instance.
 The client is initialized from NOTEBOOKLM_AUTH_JSON (env var) via
 the notebooklm-py library's built-in precedence mechanism.
 """
+
 from __future__ import annotations
 
 import logging
@@ -39,28 +40,28 @@ async def setup_client() -> None:
     Reads authentication from NOTEBOOKLM_AUTH_JSON or NOTEBOOKLM_STORAGE_PATH.
     If NOTEBOOKLM_AUTH_JSON is set but empty, it is removed so that notebooklm-py
     can fall back to the local storage file.
-    
+
     Default fallback path for notebooklm-py is ~/.notebooklm/storage_state.json.
 
     Must be called once at server startup before any tools are invoked.
     """
     global _client
     import os
-    
+
     auth_json = os.environ.get("NOTEBOOKLM_AUTH_JSON", "").strip()
     if not auth_json:
         # Unset so notebooklm-py falls back to local storage file instead of
         # raising "variable is set but empty".
         os.environ.pop("NOTEBOOKLM_AUTH_JSON", None)
-    
+
     storage_path = os.environ.get("NOTEBOOKLM_STORAGE_PATH", "").strip()
-    
+
     logger.info("Initializing NotebookLM client...")
     if storage_path:
         client = await NotebookLMClient.from_storage(storage_path)
     else:
         client = await NotebookLMClient.from_storage()
-        
+
     await client.__aenter__()
     _client = client
     logger.info("NotebookLM client initialized successfully.")

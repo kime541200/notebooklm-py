@@ -11,6 +11,7 @@ Environment Variables:
                           'notebooklm login'. Use this env var only if you need
                           to inject the JSON directly.
 """
+
 from __future__ import annotations
 
 import argparse
