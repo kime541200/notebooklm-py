@@ -1,13 +1,13 @@
 ---
 name: nblm-mcp-skill
-description: Comprehensive guide for AI Agents to effectively interact with the Google NotebookLM MCP server. Use this skill when the user asks to research topics, manage notebooks, add sources (URLs, YouTube, text), or extract insights using NotebookLM's capabilities via MCP tools.
+description: Comprehensive guide for AI Agents to effectively interact with the Google NotebookLM MCP server. Use this skill when the user asks to research topics, manage notebooks, add sources (URLs, YouTube, text), wait for source indexing, run NotebookLM research workflows, or extract insights using MCP tools.
 ---
 
 # NotebookLM MCP Skill
 
 ## Overview
 
-This skill guides you (the AI Agent) on how to effectively orchestrate the NotebookLM MCP tools to act as an advanced research assistant. You will learn the required workflows to create notebooks, add diverse sources, and perform RAG-based interactions with citation support.
+This skill guides you (the AI Agent) on how to effectively orchestrate the NotebookLM MCP tools to act as an advanced research assistant. You will learn the required workflows to create notebooks, add diverse sources, wait for source indexing when needed, run NotebookLM research tasks, import research results, and perform RAG-based interactions with citation support.
 
 ## Authentication & Setup Verification
 
@@ -56,13 +56,20 @@ When a user asks you to research a topic or use NotebookLM, follow these steps:
 - If the user doesn't specify a notebook, use `list_notebooks` to see if a relevant one exists.
 - If not, use `create_notebook` to make a new one for the research topic.
 
-### 2. Sourcing Knowledge
-- You can add various sources using `add_source` (for web URLs), `add_youtube_source`, or `add_text_source`.
-- NotebookLM requires time to index these sources. The MCP tools automatically handle standard processing times, but you should always verify the sources are fully active before asking complex questions.
-- Use `list_sources` to retrieve the `source_id`s if you need to restrict questions to specific sources.
+### 2. Source Ingestion Workflow
+- Add web pages with `add_source`, YouTube videos with `add_youtube_source`, and raw text with `add_text_source`.
+- For simple one-off ingestion, `wait=True` is fine.
+- For async or batched workflows, prefer `wait=False`, then use `get_source_status` or `wait_for_source` on the returned `source_id`.
+- Use `list_sources` to retrieve `source_id`s if you need to scope later questions to specific sources.
 
-### 3. Research & Interaction
-- Use `ask_notebook` to query the knowledge base.
+### 3. NotebookLM Research Workflow
+- Use `start_research` when the user wants NotebookLM to discover sources from the web or Drive on its own.
+- Use `get_research_status` for non-blocking polling.
+- Use `wait_for_research` when you want the MCP server to block until the research task is done.
+- If the user wants the discovered sources available inside the notebook, use `import_research_sources`, or `wait_for_research(import_all=True)`.
+
+### 4. Q&A and Follow-up Interaction
+- Use `ask_notebook` to query the notebook after sources are ready or research results have been imported.
 - **IMPORTANT**: If continuing a conversation, you MUST pass the `conversation_id` returned from the previous `ask_notebook` call.
 - Provide citations to the user based on the tool's output.
 
