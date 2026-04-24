@@ -1,8 +1,8 @@
 services:
   nblm-mcp-server:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: mcp/Dockerfile
     container_name: nblm-mcp-server
     ports:
       - "8089:8089"
