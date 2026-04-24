@@ -32,6 +32,12 @@
 - `get_chat_history`：取得特定對話的歷史紀錄。
 - `save_chat_note`：將生成的文字或見解儲存為筆記本內的永久筆記 (note)。
 
+**研究工作流：**
+- `start_research`：啟動 NotebookLM 的 fast 或 deep research 任務，支援 Web 與 Drive 來源。
+- `get_research_status`：查詢最新 research 狀態，或指定 task 的執行結果。
+- `wait_for_research`：等待 research 完成，並可選擇自動匯入所有研究結果。
+- `import_research_sources`：將 research 結果項目匯入 notebook，轉成一般 sources。
+
 ## ⚙️ 安裝與設定
 
 本專案是 `notebooklm-py` 原始碼庫的一個 `uv workspace` 成員。

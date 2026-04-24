@@ -40,13 +40,14 @@
 
 ---
 
-## 🔵 階段三：研究探員整合 (中期規劃)
+## 🔵 階段三：研究探員整合 (已實作)
 
 引入 NotebookLM 內建的強大研究能力。
 
-- [ ] **觸發深度研究** (`start_research`)：提供工具讓 MCP Server 呼叫 NotebookLM 的研究探員（支援 `fast` 或 `deep` 模式），針對指定主題在 Web 或 Google Drive 中收集資料。
-- [ ] **自動匯入研究結果**：支援研究完成後自動轉化為 Notebook 來源。
-- *注意：這類操作耗時較長，需要設計非同步等待或狀態查詢機制的工具 (`get_task_status`)。*
+- [x] **觸發研究** (`start_research`)：MCP Server 可呼叫 NotebookLM 的研究探員，支援 `fast` / `deep` 模式與 Web / Google Drive 來源。
+- [x] **查詢 / 等待研究狀態** (`get_research_status`, `wait_for_research`)：Agent 可以輪詢最新狀態，或直接等待研究任務完成。
+- [x] **自動匯入研究結果** (`import_research_sources`, `wait_for_research(import_all=True)`)：研究完成後可將結果轉成 Notebook sources。
+- *注意：研究仍屬於長時間任務，但 MCP 層現在同時提供非阻塞查詢與阻塞等待兩種介面。*
 
 ---
 

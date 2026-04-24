@@ -40,13 +40,14 @@ Expand granular control over chat and resources, allowing AI Agents to interact 
 
 ---
 
-## 🔵 Phase 3: Research Agent Integration (Mid-term Plan)
+## 🔵 Phase 3: Research Agent Integration (Implemented)
 
 Introduce NotebookLM's powerful built-in research capabilities.
 
-- [ ] **Trigger Deep Research** (`start_research`): Provide a tool for the MCP Server to call the NotebookLM research agent (supporting `fast` or `deep` modes) to collect data on a specific topic from the Web or Google Drive.
-- [ ] **Auto-import Research Results**: Support automatically converting research results into Notebook sources upon completion.
-- *Note: These operations are time-consuming and require designing tools for asynchronous waiting or status querying (`get_task_status`).*
+- [x] **Trigger Research** (`start_research`): The MCP Server can call the NotebookLM research agent in `fast` or `deep` mode against Web or Google Drive sources.
+- [x] **Query / Wait for Research Status** (`get_research_status`, `wait_for_research`): Agents can poll the latest status or block until a research task finishes.
+- [x] **Auto-import Research Results** (`import_research_sources`, `wait_for_research(import_all=True)`): Research outputs can be converted into Notebook sources after completion.
+- *Note: Research remains a long-running operation, but the MCP layer now exposes both non-blocking status checks and a blocking wait helper.*
 
 ---
 

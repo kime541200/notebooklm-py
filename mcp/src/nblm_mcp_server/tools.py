@@ -5,6 +5,7 @@ All tools are registered onto the FastMCP instance via register().
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any
 
@@ -307,4 +308,185 @@ def register(mcp: FastMCP) -> None:
             "success": True,
             "note_id": note.id,
             "title": note.title,
+        }
+
+    # ──────────────────────────────────────────────
+    # Research Tools
+    # ──────────────────────────────────────────────
+
+    @mcp.tool()
+    async def start_research(
+        notebook_id: str,
+        query: str,
+        source: str = "web",
+        mode: str = "fast",
+    ) -> dict[str, Any] | None:
+        """Start a NotebookLM research task.
+
+        Args:
+            notebook_id: The ID of the notebook.
+            query: The research query to run.
+            source: Research source type, either 'web' or 'drive'.
+            mode: Research mode, either 'fast' or 'deep'.
+
+        Returns:
+            A dict with the research task metadata, including 'task_id' and
+            optional 'report_id'. Returns None if NotebookLM does not return
+            a task payload.
+        """
+        client = await get_client()
+        logger.info(
+            "Starting %s %s research in notebook %s",
+            mode,
+            source,
+            notebook_id,
+        )
+        return await client.research.start(
+            notebook_id=notebook_id,
+            query=query,
+            source=source,
+            mode=mode,
+        )
+
+    @mcp.tool()
+    async def get_research_status(
+        notebook_id: str,
+        task_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Get the latest research status for a notebook or a specific task.
+
+        Args:
+            notebook_id: The ID of the notebook.
+            task_id: Optional research task ID or report ID to match.
+
+        Returns:
+            The latest research status dict when task_id is omitted. When task_id
+            is provided, returns the matching task entry from the notebook's
+            polled research tasks, or a not_found status payload if absent.
+        """
+        client = await get_client()
+        result = await client.research.poll(notebook_id)
+
+        if task_id is None:
+            return result
+
+        for task in result.get("tasks", []):
+            if task.get("task_id") == task_id:
+                return task
+
+        return {
+            "task_id": task_id,
+            "status": "not_found",
+            "notebook_id": notebook_id,
+        }
+
+    @mcp.tool()
+    async def import_research_sources(
+        notebook_id: str,
+        task_id: str,
+        sources: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Import research results into notebook sources.
+
+        Args:
+            notebook_id: The ID of the notebook.
+            task_id: The research task ID or report ID to import from.
+            sources: The research source entries returned by research status tools.
+
+        Returns:
+            A dict containing the task ID, requested source count, imported
+            source count, and imported source metadata.
+        """
+        client = await get_client()
+        imported_sources = await client.research.import_sources(notebook_id, task_id, sources)
+        return {
+            "task_id": task_id,
+            "requested_count": len(sources),
+            "imported_count": len(imported_sources),
+            "imported_sources": imported_sources,
+        }
+
+    @mcp.tool()
+    async def wait_for_research(
+        notebook_id: str,
+        task_id: str | None = None,
+        timeout: int = 300,
+        interval: int = 5,
+        import_all: bool = False,
+    ) -> dict[str, Any]:
+        """Wait for a research task to complete and optionally import its sources.
+
+        Args:
+            notebook_id: The ID of the notebook.
+            task_id: Optional research task ID or report ID to wait for.
+            timeout: Maximum seconds to wait before returning a timeout payload.
+            interval: Seconds between status polls.
+            import_all: If True, import all sources from the completed task.
+
+        Returns:
+            A dict describing the completed task, timeout, or missing-task state.
+            When import_all is True, includes imported source metadata.
+        """
+        client = await get_client()
+        elapsed = 0
+
+        while elapsed <= timeout:
+            result = await client.research.poll(notebook_id)
+            tasks = result.get("tasks", [])
+
+            if task_id is None:
+                selected_task = result if result.get("status") != "no_research" else None
+            else:
+                selected_task = next(
+                    (task for task in tasks if task.get("task_id") == task_id),
+                    None,
+                )
+
+            if selected_task is None:
+                status = result.get("status")
+                if status == "no_research":
+                    return {
+                        "task_id": task_id,
+                        "status": "no_research",
+                        "notebook_id": notebook_id,
+                    }
+                if task_id is not None:
+                    return {
+                        "task_id": task_id,
+                        "status": "not_found",
+                        "notebook_id": notebook_id,
+                    }
+            else:
+                selected_task_id = selected_task.get("task_id")
+                status = selected_task.get("status")
+                if status == "completed":
+                    response = {
+                        "task_id": selected_task_id,
+                        "status": status,
+                        "query": selected_task.get("query", ""),
+                        "sources": selected_task.get("sources", []),
+                        "summary": selected_task.get("summary", ""),
+                        "report": selected_task.get("report", ""),
+                    }
+                    if import_all:
+                        imported_sources = await client.research.import_sources(
+                            notebook_id,
+                            selected_task_id,
+                            selected_task.get("sources", []),
+                        )
+                        response["imported_count"] = len(imported_sources)
+                        response["imported_sources"] = imported_sources
+                    return response
+
+            if elapsed == timeout:
+                break
+
+            await asyncio.sleep(interval)
+            elapsed = min(timeout, elapsed + interval)
+
+        return {
+            "task_id": task_id,
+            "status": "timeout",
+            "notebook_id": notebook_id,
+            "timeout": timeout,
         }

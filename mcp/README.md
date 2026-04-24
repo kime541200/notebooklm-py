@@ -32,6 +32,12 @@ Currently, this MCP server exposes the following tools to AI agents:
 - `get_chat_history`: Retrieve the history of a specific conversation.
 - `save_chat_note`: Save generated text or insights as a persistent note inside the notebook.
 
+**Research Workflow:**
+- `start_research`: Start a fast or deep NotebookLM research task against web or Drive sources.
+- `get_research_status`: Poll the latest research status or inspect a specific research task.
+- `wait_for_research`: Wait for a research task to complete and optionally auto-import all discovered sources.
+- `import_research_sources`: Import research result entries into the notebook as standard sources.
+
 ## ⚙️ Installation & Setup
 
 This project is a `uv workspace` member of the `notebooklm-py` repository.
