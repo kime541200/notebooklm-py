@@ -61,7 +61,7 @@ This project is a `uv workspace` member of the `notebooklm-py` repository.
    ```bash
    uv run notebooklm login
    ```
-   This saves your session to `~/.notebooklm/storage_state.json`. By default, the server will automatically find this file.
+   This usually saves your session to `~/.notebooklm/profiles/default/storage_state.json`. By default, the server will automatically find this file, while still supporting the legacy `~/.notebooklm/storage_state.json` fallback.
    If you need to customize settings, you can copy the env example in the `mcp/` directory:
    ```bash
    cd mcp

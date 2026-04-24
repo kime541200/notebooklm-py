@@ -14,7 +14,7 @@ This skill guides you (the AI Agent) on how to effectively orchestrate the Noteb
 The NotebookLM MCP server relies on Playwright browser storage state for authentication. Before using the tools or starting the server, you **MUST** ensure the environment is authenticated.
 
 1. **Check Authentication Status**:
-   - Check if `~/.notebooklm/storage_state.json` exists, OR
+   - Check if `~/.notebooklm/profiles/default/storage_state.json` exists, OR
    - Run `uv run notebooklm status` from the workspace root (it should show "Authenticated as...").
 
 2. **Login if Necessary**:
@@ -24,7 +24,7 @@ The NotebookLM MCP server relies on Playwright browser storage state for authent
    ```
    *(If using standard Python `venv`, ensure the environment is activated and run `notebooklm login`)*.
    
-   This will save the session to `~/.notebooklm/storage_state.json`, which the MCP server automatically reads.
+   This will usually save the session to `~/.notebooklm/profiles/default/storage_state.json`, which the MCP server automatically reads. Legacy setups may still use `~/.notebooklm/storage_state.json` as a fallback.
 
 ## Starting the MCP Server
 

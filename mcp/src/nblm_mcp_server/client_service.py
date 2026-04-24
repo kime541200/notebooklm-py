@@ -41,7 +41,7 @@ async def setup_client() -> None:
     If NOTEBOOKLM_AUTH_JSON is set but empty, it is removed so that notebooklm-py
     can fall back to the local storage file.
 
-    Default fallback path for notebooklm-py is ~/.notebooklm/storage_state.json.
+    The default lookup path is profile-based (typically ~/.notebooklm/profiles/default/storage_state.json), with a legacy fallback to ~/.notebooklm/storage_state.json for older setups.
 
     Must be called once at server startup before any tools are invoked.
     """

@@ -12,7 +12,7 @@ This project is a Model Context Protocol (MCP) server built with Python (`FastMC
 
 This project is fully base on [notebooklm-py](https://github.com/teng-lin/notebooklm-py.git) to access [NotebookLM](https://blog.google/innovation-and-ai/technology/ai/notebooklm-google-ai/). 
 
-It automatically authenticates by reading the Playwright browser storage state JSON (usually located at `~/.notebooklm/storage_state.json` after running `notebooklm login`). You can also override the path via `NOTEBOOKLM_STORAGE_PATH` or inject JSON directly via `NOTEBOOKLM_AUTH_JSON`.
+It automatically authenticates by reading the Playwright browser storage state JSON (usually located at `~/.notebooklm/profiles/default/storage_state.json` after running `notebooklm login`). Older setups may still fall back to `~/.notebooklm/storage_state.json`. You can also override the path via `NOTEBOOKLM_STORAGE_PATH` or inject JSON directly via `NOTEBOOKLM_AUTH_JSON`.
 
 ## Setup
 
@@ -23,7 +23,7 @@ This project uses `uv` as the exclusive Python package manager and operates as a
 uv sync --all-packages
 
 # 2. Authenticate
-# Run the local login command to generate ~/.notebooklm/storage_state.json
+# Run the local login command to generate ~/.notebooklm/profiles/default/storage_state.json
 uv run notebooklm login
 ```
 

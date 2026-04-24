@@ -6,10 +6,12 @@ Usage:
 
 Environment Variables:
     NOTEBOOKLM_AUTH_JSON  Optional. Playwright storage state JSON containing
-                          Google auth cookies. By default, the server reads
-                          ~/.notebooklm/storage_state.json created by running
-                          'notebooklm login'. Use this env var only if you need
-                          to inject the JSON directly.
+                          Google auth cookies. By default, the server reads the
+                          profile-based path created by `notebooklm login`
+                          (typically ~/.notebooklm/profiles/default/storage_state.json),
+                          while remaining compatible with the legacy
+                          ~/.notebooklm/storage_state.json fallback. Use this
+                          env var only if you need to inject the JSON directly.
 """
 
 from __future__ import annotations

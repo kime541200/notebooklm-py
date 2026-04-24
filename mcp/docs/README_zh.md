@@ -61,7 +61,7 @@
    ```bash
    uv run notebooklm login
    ```
-   這會將你的登入階段儲存至 `~/.notebooklm/storage_state.json`。預設情況下，伺服器會自動讀取此檔案。
+   這通常會將你的登入階段儲存至 `~/.notebooklm/profiles/default/storage_state.json`。預設情況下，伺服器會自動讀取此檔案，同時仍相容於舊版 `~/.notebooklm/storage_state.json` 的 fallback。
    如果你需要客製化設定，可以複製 `mcp/` 目錄下的範例環境變數檔：
    ```bash
    cd mcp

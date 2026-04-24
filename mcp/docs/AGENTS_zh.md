@@ -12,7 +12,7 @@
 
 本專案完全基於 [notebooklm-py](https://github.com/teng-lin/notebooklm-py.git) 來存取 [NotebookLM](https://blog.google/innovation-and-ai/technology/ai/notebooklm-google-ai/)。
 
-它會自動讀取 Playwright 瀏覽器的儲存狀態 JSON 進行認證（在執行 `notebooklm login` 後，通常位於 `~/.notebooklm/storage_state.json`）。你也可以透過 `NOTEBOOKLM_STORAGE_PATH` 覆寫路徑，或透過 `NOTEBOOKLM_AUTH_JSON` 直接注入 JSON。
+它會自動讀取 Playwright 瀏覽器的儲存狀態 JSON 進行認證（在執行 `notebooklm login` 後，通常位於 `~/.notebooklm/profiles/default/storage_state.json`）。舊版環境仍可能 fallback 到 `~/.notebooklm/storage_state.json`。你也可以透過 `NOTEBOOKLM_STORAGE_PATH` 覆寫路徑，或透過 `NOTEBOOKLM_AUTH_JSON` 直接注入 JSON。
 
 ## 設定
 
@@ -23,7 +23,7 @@
 uv sync --all-packages
 
 # 2. 進行認證
-# 執行本地登入指令來產生 ~/.notebooklm/storage_state.json
+# 執行本地登入指令來產生 ~/.notebooklm/profiles/default/storage_state.json
 uv run notebooklm login
 ```
 
