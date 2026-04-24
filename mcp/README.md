@@ -21,9 +21,11 @@ Currently, this MCP server exposes the following tools to AI agents:
 
 **Source Management:**
 - `list_sources`: List all sources within a specific notebook.
-- `add_source`: Add a URL (webpage) as a source.
-- `add_youtube_source`: Add a YouTube video as a source.
-- `add_text_source`: Add raw pasted text as a source.
+- `add_source`: Add a URL (webpage) as a source and return structured status fields.
+- `add_youtube_source`: Add a YouTube video as a source and return structured status fields.
+- `add_text_source`: Add raw pasted text as a source and return structured status fields.
+- `get_source_status`: Inspect the indexing status of a single source.
+- `wait_for_source`: Wait for a single source to finish indexing.
 - `delete_source`: Delete a source from a notebook.
 - `get_source_fulltext`: Retrieve the full indexed raw text of a source.
 

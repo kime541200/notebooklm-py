@@ -25,6 +25,7 @@ Expand granular control over chat and resources, allowing AI Agents to interact 
 
 ### Resource Management Expansion
 - [x] **Delete Resources**: Provide tools to delete a Notebook or specific sources.
+- [x] **Get Source Status / Wait** (`get_source_status`, `wait_for_source`): Allow Agents to inspect a single source's indexing state or wait for it to become ready after asynchronous imports.
 - [x] **Get Source Fulltext** (`get_source_fulltext`): Allow Agents to directly read the complete plain text content of a source after system indexing, which is highly useful for local analysis.
 - [x] **Multiple Source Types Import**:
   - [x] Support adding YouTube videos as sources.

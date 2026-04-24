@@ -10,10 +10,29 @@ import logging
 from typing import Any
 
 from fastmcp import FastMCP
+from notebooklm.exceptions import SourceNotFoundError, SourceProcessingError, SourceTimeoutError
+from notebooklm.rpc.types import source_status_to_str
 
 from .client_service import get_client
 
 logger = logging.getLogger(__name__)
+
+
+def _serialize_source_status(source: Any) -> dict[str, Any]:
+    """Convert a Source object into an MCP-friendly status payload."""
+    created_at = source.created_at.isoformat() if source.created_at else None
+    return {
+        "id": source.id,
+        "title": source.title,
+        "kind": str(source.kind),
+        "status_code": int(source.status),
+        "status": source_status_to_str(source.status),
+        "is_ready": source.is_ready,
+        "is_processing": source.is_processing,
+        "is_error": source.is_error,
+        "url": source.url,
+        "created_at": created_at,
+    }
 
 
 def register(mcp: FastMCP) -> None:
@@ -105,11 +124,7 @@ def register(mcp: FastMCP) -> None:
         client = await get_client()
         logger.info("Adding URL source '%s' to notebook %s", url, notebook_id)
         source = await client.sources.add_url(notebook_id, url, wait=wait)
-        return {
-            "id": source.id,
-            "title": source.title,
-            "status": str(source.status),
-        }
+        return _serialize_source_status(source)
 
     @mcp.tool()
     async def add_youtube_source(
@@ -128,11 +143,7 @@ def register(mcp: FastMCP) -> None:
         client = await get_client()
         logger.info("Adding YouTube source '%s' to notebook %s", youtube_url, notebook_id)
         source = await client.sources.add_url(notebook_id, youtube_url, wait=wait)
-        return {
-            "id": source.id,
-            "title": source.title,
-            "status": str(source.status),
-        }
+        return _serialize_source_status(source)
 
     @mcp.tool()
     async def add_text_source(
@@ -152,11 +163,7 @@ def register(mcp: FastMCP) -> None:
         client = await get_client()
         logger.info("Adding text source '%s' to notebook %s", title, notebook_id)
         source = await client.sources.add_text(notebook_id, title, text, wait=wait)
-        return {
-            "id": source.id,
-            "title": source.title,
-            "status": str(source.status),
-        }
+        return _serialize_source_status(source)
 
     @mcp.tool()
     async def delete_source(notebook_id: str, source_id: str) -> dict[str, Any]:
@@ -173,6 +180,86 @@ def register(mcp: FastMCP) -> None:
         await client.sources.delete(notebook_id, source_id)
         logger.info("Deleted source %s from notebook %s", source_id, notebook_id)
         return {"success": True, "notebook_id": notebook_id, "source_id": source_id}
+
+    @mcp.tool()
+    async def get_source_status(notebook_id: str, source_id: str) -> dict[str, Any]:
+        """Get the current indexing status of a specific source.
+
+        Args:
+            notebook_id: The ID of the notebook.
+            source_id: The ID of the source.
+
+        Returns:
+            A dict describing the source status, type, and readiness flags.
+            Returns a not_found payload if the source does not exist.
+        """
+        client = await get_client()
+        source = await client.sources.get(notebook_id, source_id)
+        if source is None:
+            return {
+                "id": source_id,
+                "status": "not_found",
+                "notebook_id": notebook_id,
+            }
+        return _serialize_source_status(source)
+
+    @mcp.tool()
+    async def wait_for_source(
+        notebook_id: str,
+        source_id: str,
+        timeout: int = 120,
+        initial_interval: float = 1.0,
+        max_interval: float = 10.0,
+        backoff_factor: float = 1.5,
+    ) -> dict[str, Any]:
+        """Wait for a single source to finish indexing.
+
+        Args:
+            notebook_id: The ID of the notebook.
+            source_id: The ID of the source to wait for.
+            timeout: Maximum seconds to wait.
+            initial_interval: Initial polling interval in seconds.
+            max_interval: Maximum polling interval in seconds.
+            backoff_factor: Interval multiplier between polls.
+
+        Returns:
+            A dict describing the final source state, or a structured error
+            payload for timeout, processing failure, or missing sources.
+        """
+        client = await get_client()
+        try:
+            source = await client.sources.wait_until_ready(
+                notebook_id,
+                source_id,
+                timeout=timeout,
+                initial_interval=initial_interval,
+                max_interval=max_interval,
+                backoff_factor=backoff_factor,
+            )
+        except SourceTimeoutError as exc:
+            return {
+                "id": source_id,
+                "status": "timeout",
+                "notebook_id": notebook_id,
+                "message": str(exc),
+                "timeout": timeout,
+            }
+        except SourceProcessingError as exc:
+            return {
+                "id": source_id,
+                "status": "error",
+                "notebook_id": notebook_id,
+                "message": str(exc),
+            }
+        except SourceNotFoundError as exc:
+            return {
+                "id": source_id,
+                "status": "not_found",
+                "notebook_id": notebook_id,
+                "message": str(exc),
+            }
+
+        return _serialize_source_status(source)
 
     @mcp.tool()
     async def get_source_fulltext(notebook_id: str, source_id: str) -> dict[str, Any]:

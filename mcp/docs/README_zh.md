@@ -21,9 +21,11 @@
 
 **來源 (Source) 管理：**
 - `list_sources`：列出特定筆記本內的所有來源。
-- `add_source`：新增 URL (網頁) 作為來源。
-- `add_youtube_source`：新增 YouTube 影片作為來源。
-- `add_text_source`：新增純文字內容作為來源。
+- `add_source`：新增 URL (網頁) 作為來源，並回傳結構化狀態欄位。
+- `add_youtube_source`：新增 YouTube 影片作為來源，並回傳結構化狀態欄位。
+- `add_text_source`：新增純文字內容作為來源，並回傳結構化狀態欄位。
+- `get_source_status`：查詢單一 source 的 indexing 狀態。
+- `wait_for_source`：等待單一 source 完成 indexing。
 - `delete_source`：從筆記本中刪除來源。
 - `get_source_fulltext`：取得來源經過索引後的完整純文字內容。
 

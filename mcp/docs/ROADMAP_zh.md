@@ -25,6 +25,7 @@
 
 ### 資源管理擴充
 - [x] **刪除資源**：提供刪除 Notebook 或特定來源的工具。
+- [x] **查詢 / 等待來源狀態** (`get_source_status`, `wait_for_source`)：讓 Agent 可在非同步匯入後查詢單一 source 的 indexing 狀態，或直接等待其完成。
 - [x] **取得來源全文** (`get_source_fulltext`)：讓 Agent 可以直接讀取來源經過系統索引後的完整純文字內容，這對於後續的在地端分析非常有用。
 - [x] **多種類型來源匯入**：
   - [x] 支援新增 YouTube 影片來源。
